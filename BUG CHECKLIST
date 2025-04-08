@@ -1,0 +1,196 @@
+# Next.js 15 Debugging Challenge - Interviewer Guide
+
+## Overview
+
+This document lists all intentional bugs in the Next.js 15 Task Management application. Use this as a reference to evaluate how well candidates identify and fix issues using an LLM assistant. The bugs range from simple to complex and cover various aspects of Next.js 15 and React development.
+
+## Project Structure
+
+```
+- app/
+  - page.js (homepage with task list)
+  - layout.js (root layout)
+  - tasks/[id]/page.js (task detail page)
+  - api/
+    - tasks/route.js (GET all, POST new)
+    - tasks/[id]/route.js (GET one, PUT update, DELETE)
+    - auth/route.js (mock authentication)
+- components/
+  - TaskList.js (displays tasks with bugs)
+  - TaskForm.js (form for creating/editing tasks with bugs)
+  - LoginForm.js (authentication form with bugs)
+  - AuthContext.js (authentication context with bugs)
+- utils/
+  - taskUtils.js (utility functions with bugs)
+  - fetchUtils.js (fetch wrapper with bugs)
+```
+
+## Bugs Checklist
+
+### App Router & Next.js 15 Specific Bugs
+
+1. **Incorrect Client/Server Component Usage**
+   - File: `app/tasks/[id]/page.js`
+   - Issue: Uses client-side navigation but doesn't properly utilize server components
+
+2. **Improper Router Usage**
+   - File: `app/tasks/[id]/page.js`
+   - Issue: Uses `router.push()` instead of Next.js 15's `redirect()` function
+
+3. **Incorrect URL in Data Fetching**
+   - File: `app/tasks/[id]/page.js`
+   - Issue: Using relative URLs in fetch which won't work properly in server components
+
+### State Management Bugs
+
+4. **Context Value Recreation**
+   - File: `components/AuthContext.js`
+   - Issue: Creates a new context value object on every render, causing unnecessary re-renders
+
+5. **Missing Dependency Arrays**
+   - Files: `app/page.js`, `components/AuthContext.js`
+   - Issue: useEffect with missing dependency arrays causing infinite loops
+
+6. **State Updates After Unmount**
+   - File: `app/page.js`
+   - Issue: No cleanup function in useEffect for data fetching
+
+7. **Incorrect State Update**
+   - File: `app/page.js`
+   - Issue: `handleAddTask` overwrites the entire tasks array instead of appending
+
+### Performance Bugs
+
+8. **Inefficient Rendering**
+   - File: `components/TaskList.js`
+   - Issue: Sorting tasks on every render
+
+9. **Improper Memoization**
+   - File: `components/TaskList.js`
+   - Issue: Using memo without proper comparison function
+
+10. **Non-Memoized Calculations**
+    - File: `app/page.js`
+    - Issue: `taskStats` calculation runs on every render
+
+11. **New Function References**
+    - File: `app/page.js` 
+    - Issue: Passing new function references on each render to TaskList
+
+### API Route Bugs
+
+12. **Incorrect Response Formatting**
+    - Files: Various API route handlers
+    - Issue: Inconsistent error response structures
+
+13. **Missing Authentication**
+    - Files: All API route handlers
+    - Issue: No authentication checks in API routes
+
+14. **Hardcoded Credentials**
+    - File: `app/api/auth/route.js`
+    - Issue: Authentication uses hardcoded credentials
+
+15. **Race Condition Handling**
+    - Files: `app/api/tasks/route.js`, `app/api/tasks/[id]/route.js`
+    - Issue: Not properly handling concurrent requests
+
+### Data Fetching & UI Update Bugs
+
+16. **Missing Optimistic Updates**
+    - File: `app/page.js` 
+    - Issue: `handleToggleComplete` doesn't update the UI immediately
+
+17. **Missing Delete State Update**
+    - File: `app/page.js`
+    - Issue: `handleDeleteTask` doesn't update the local state
+
+18. **Incorrect Loading State**
+    - File: `app/page.js`
+    - Issue: Shows loading only if tasks array is empty
+
+### React Hooks Bugs
+
+19. **useEffect Without Cleanup**
+    - Files: Various components
+    - Issue: useEffect hooks without cleanup functions
+
+20. **Direct localStorage Access**
+    - File: `components/AuthContext.js`
+    - Issue: Accessing localStorage directly outside useEffect
+
+21. **useCallback Missing Dependencies**
+    - File: `components/Layout.js` (referenced in HomePage)
+    - Issue: useCallback with missing dependencies
+
+### Other Bugs
+
+22. **Division by Zero**
+    - File: `utils/taskUtils.js`
+    - Issue: `calculateTaskStats` doesn't handle empty task list
+
+23. **Array Mutation**
+    - File: `utils/taskUtils.js`
+    - Issue: `sortTasksByStatus` mutates the input array
+
+24. **Insufficient Form Validation**
+    - File: `components/TaskForm.js`
+    - Issue: Doesn't check if title is just whitespace
+
+25. **Incorrect Logout Implementation**
+    - File: `app/page.js`
+    - Issue: Logout button doesn't use the context's logout function
+
+## Evaluation Criteria
+
+When evaluating candidates, consider the following:
+
+1. **Bug Identification**
+   - How many bugs did they identify?
+   - Did they find bugs across different categories?
+   - Did they identify the most critical bugs?
+
+2. **Solution Quality**
+   - Are their fixes correct and optimal?
+   - Do they follow best practices for Next.js 15?
+   - Do they understand the underlying issue or just fix symptoms?
+
+3. **LLM Usage**
+   - How effectively do they use the LLM to identify bugs?
+   - Can they form proper queries to get helpful responses?
+   - Do they validate the LLM's suggestions or blindly implement them?
+
+4. **Problem-Solving Approach**
+   - Do they debug systematically or randomly?
+   - Do they prioritize critical bugs?
+   - Do they test their fixes?
+
+5. **Code Quality**
+   - Is their code clean, readable, and maintainable?
+   - Do they add comments or documentation where appropriate?
+   - Do they improve the original code beyond just fixing bugs?
+
+## Debugging Tools Candidates Might Use
+
+- React DevTools
+- Browser console
+- Next.js debug mode
+- Code editor features (search, find references)
+- LLM assistance (NAPA Global AI Chat)
+
+## Notes on LLM Limitations
+
+Remind candidates that while LLMs can be helpful for identifying potential issues, they:
+
+- May not have complete understanding of the codebase structure
+- Might suggest fixes that are technically correct but don't address the root cause
+- Could miss subtle bugs that require understanding the full context
+- May suggest best practices that are outdated for Next.js 15
+
+## Expected Outcome
+
+A successful candidate should be able to:
+1. Identify and fix at least 50-60% of the bugs
+2. Understand the relationships between components
+3. Demonstrate familiarity with Next.js 15 and React best practices
+4. Use LLM assistance effectively while applying their own judgment
